@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(publicPath));
 
 app.get('/health', (req, res) => {
-    res.status(200).send(JSON.stringify({ status: 'ok' }));
+    res.status(200).json({ status: 'ok' });
 });
 
 module.exports = app;
