@@ -1,11 +1,17 @@
 const db = require('../../database');
 
-function createTask(title) {
+function insertTask(title) {
     const stmt = db.prepare('INSERT INTO tasks (title) VALUES (?)');
     const info = stmt.run(title);
     return info.lastInsertRowid;
 }
 
+function listAllTasks() {
+    const stmt = db.prepare('SELECT id, title, status, created_at FROM tasks ORDER BY id DESC');
+    return stmt.all();
+}
+
 module.exports = {
-    createTask,
+    insertTask,
+    listAllTasks,
 };

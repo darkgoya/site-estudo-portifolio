@@ -1,8 +1,10 @@
 const { Router } = require('express');
 const router = Router();
 
-const { createTaskController } = require('./tarefas.controller');
+const { createTaskController, getAllTasksController } = require('./tarefas.controller');
 
 router.post('/', createTaskController);
+router.get('/', getAllTasksController);
+
 
 module.exports = router;

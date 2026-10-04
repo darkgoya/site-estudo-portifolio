@@ -1,4 +1,4 @@
-const {createTask} = require('./tarefas.service');
+const { createTask, getAllTasks } = require('./tarefas.service');
 
 function createTaskController(req, res) {
     try {
@@ -11,6 +11,17 @@ function createTaskController(req, res) {
     }
 }
 
+function getAllTasksController(req, res) {
+    try {
+        const tasks = getAllTasks();
+        return res.status(200).json(tasks);
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createTaskController,
+    getAllTasksController,
 };
