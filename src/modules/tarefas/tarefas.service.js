@@ -1,4 +1,4 @@
-const { insertTask, listAllTasks, listTaskById } = require('./tarefas.repository');
+const { insertTask, listAllTasks, listTaskById, updateTaskStatus } = require('./tarefas.repository');
 
 function createTask(title) {
     if (typeof title !== 'string' || title.trim() === '') {
@@ -32,8 +32,28 @@ function getTaskById(id) {
     return task;
 }
 
+function changeTaskStatus(id, status) {
+    if (typeof id !== 'number' || Number.isNaN(id) || id <= 0) {
+        throw new Error('ID inválido');
+    }
+
+    if (typeof status !== 'string' || !['pending', 'done'].includes(status)) {
+        throw new Error('Status inválido');
+    }
+
+    const updated = updateTaskStatus(id, status);
+
+    if (!updated) {
+        throw new Error('Tarefa não encontrada');
+    }
+
+    return { id, status };
+
+}
+
 module.exports = {
     createTask,
     getAllTasks,
-    getTaskById
+    getTaskById,
+    changeTaskStatus
 };

@@ -16,8 +16,15 @@ function listTaskById(id) {
     return stmt.get(id);
 }
 
+function updateTaskStatus(id, status) {
+    const stmt = db.prepare('UPDATE tasks SET status = ? WHERE id = ?');
+    const info = stmt.run(status, id);
+    return info.changes > 0;
+}
+
 module.exports = {
     insertTask,
     listAllTasks,
     listTaskById,
+    updateTaskStatus
 };
