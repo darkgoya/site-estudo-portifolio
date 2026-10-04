@@ -1,4 +1,4 @@
-const { insertTask, listAllTasks, listTaskById, updateTaskStatus } = require('./tarefas.repository');
+const { insertTask, listAllTasks, listTaskById, updateTaskStatus, deleteTaskById } = require('./tarefas.repository');
 
 function createTask(title) {
     if (typeof title !== 'string' || title.trim() === '') {
@@ -48,12 +48,26 @@ function changeTaskStatus(id, status) {
     }
 
     return { id, status };
+}
 
+function removeTaskById(id) {
+    if (typeof id !== 'number' || Number.isNaN(id) || id <= 0) {
+        throw new Error('ID inválido');
+    }
+
+    const deleted = deleteTaskById(id);
+
+    if (!deleted) {
+        throw new Error('Tarefa não encontrada');
+    }
+
+    return { id };
 }
 
 module.exports = {
     createTask,
     getAllTasks,
     getTaskById,
-    changeTaskStatus
+    changeTaskStatus,
+    removeTaskById
 };

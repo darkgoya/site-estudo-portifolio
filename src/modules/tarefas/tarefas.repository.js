@@ -22,9 +22,16 @@ function updateTaskStatus(id, status) {
     return info.changes > 0;
 }
 
+function deleteTaskById(id) {
+    const stmt = db.prepare('DELETE FROM tasks WHERE id = ?');
+    const info = stmt.run(id);
+    return info.changes > 0;
+}
+
 module.exports = {
     insertTask,
     listAllTasks,
     listTaskById,
-    updateTaskStatus
+    updateTaskStatus,
+    deleteTaskById
 };
