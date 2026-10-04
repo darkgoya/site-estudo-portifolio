@@ -11,7 +11,13 @@ function listAllTasks() {
     return stmt.all();
 }
 
+function listTaskById(id) {
+    const stmt = db.prepare('SELECT id, title, status, created_at FROM tasks WHERE id = ?');
+    return stmt.get(id);
+}
+
 module.exports = {
     insertTask,
     listAllTasks,
+    listTaskById,
 };
