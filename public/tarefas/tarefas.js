@@ -30,7 +30,7 @@ function renderTasks(tasks) {
             <span class="task-title">${task.title}</span>
             <div class="task-actions">
                 <button type="button" onclick="toggleTaskStatus(${task.id}, '${task.status}')">
-                    ${task.status === 'done' ? 'Marcar como pendente' : 'Marcar como concluída'}
+                    ${task.status === 'done' ? 'Pendente' : 'Concluída'}
                 </button>
                 <button type="button" onclick="deleteTask(${task.id})">Excluir</button>
             </div>
@@ -40,3 +40,71 @@ function renderTasks(tasks) {
 }
 
 fetchTasks();
+
+taskForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const title = taskInput.value.trim();
+
+    if (!title) return;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title })
+        });
+        if (!response.ok) {
+            throw new Error('Erro ao adicionar tarefa no servidor');
+        }
+
+        taskInput.value = '';
+
+        await fetchTasks();
+    } catch (error) {
+        console.error('Erro ao adicionar tarefa:', error);
+    }
+});
+
+async function toggleTaskStatus(id, currentStatus) {
+    const newStatus = currentStatus === 'done' ? 'pending' : 'done';
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar status da tarefa no servidor');
+        }
+
+        await fetchTasks();
+    } catch (error) {
+        console.error('Erro ao atualizar status da tarefa:', error);
+    }
+}
+
+async function deleteTask(id) {
+    const confirmDelete = confirm('Tem certeza de que deseja excluir esta tarefa?');
+
+    if (!confirmDelete) return;
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao excluir tarefa no servidor');
+        }
+
+        await fetchTasks();
+    } catch (error) {
+        console.error('Erro ao excluir tarefa:', error);
+    }
+}
