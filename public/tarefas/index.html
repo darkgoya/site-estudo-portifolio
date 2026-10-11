@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de tarefas</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="./tarefas.css">
+</head>
+<body>
+    <main class="container">
+        <nav class="back-nav">
+            <a href="/">&larr; Voltar a página principal</a>
+        </nav>
+
+        <header>
+            <h1>Minhas Tarefas</h1>
+        </header>
+
+        <section class="task-form-section">
+            <form id="task-form">
+                <input
+                    type="text"
+                    id="task-input"
+                    placeholder="Digite uma nova tarefa"
+                    required
+                    autocomplete="off"
+                >
+
+                <button type="submit">Adicionar</button>
+            </form>    
+        </section>
+
+        <section class="task-list-section">
+            <ul id="task-list"></ul>
+        </section>
+
+    </main>
+
+    <script src="/tarefas/tarefas.js" defer></script>
+</body>
+</html>
