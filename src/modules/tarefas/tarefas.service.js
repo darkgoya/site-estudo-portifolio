@@ -21,13 +21,13 @@ function getAllTasks() {
 
 function getTaskById(id) {
     if (typeof id !== 'number' || Number.isNaN(id) || id <= 0) {
-        throw new Error('ID inválido');
+        throw new AppError('ID inválido', 400);
     }
 
     const task = listTaskById(id);
 
     if (!task) {
-        throw new Error('Tarefa não encontrada');
+        throw new AppError('Tarefa não encontrada', 404);
     }
 
     return task;
