@@ -1,31 +1,49 @@
-const API_URL = '/api/tarefas'; //URL base da API de tarefas
+const API_URL = '/api/tarefas';
 
-const taskList = document.getElementById('task-list'); //referência ao elemento HTML que exibe a lista de tarefas
-const taskForm = document.getElementById('task-form'); //referência ao formulário de criação de tarefas
-const taskInput = document.getElementById('task-input'); //referência ao campo de texto para digitar o título da tarefa
+const taskList = document.getElementById('task-list');
+const taskForm = document.getElementById('task-form');
+const taskInput = document.getElementById('task-input');
 
-/*função assíncrona que busca todas as tarefas da API e renderiza na tela*/
 async function fetchTasks() {
     try {
-        const response = await fetch(API_URL); //envia requisição GET para a API e aguarda a resposta
-        if (!response.ok) { //verifica se a resposta indica erro HTTP
-            throw new Error('Falha ao obter tarefas'); //lança erro caso a resposta não seja bem-sucedida
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+            throw new Error('Falha ao obter tarefas');
         }
-        const tasks = await response.json(); //converte o corpo da resposta em JSON com a lista de tarefas
-        renderTasks(tasks); //chama a função que exibe as tarefas no DOM
+        const tasks = await response.json();
+        renderTasks(tasks);
     } catch (error) {
-        console.error('Erro ao buscar tarefas:', error); //exibe o erro no console do navegador
+        console.error('Erro ao buscar tarefas:', error);
     }
 }
 
-/*função que limpa a lista atual e renderiza todas as tarefas recebidas no DOM*/
 function renderTasks(tasks) {
-    taskList.innerHTML = ''; //limpa o conteúdo atual da lista para evitar duplicação
-    tasks.forEach(task => { //itera sobre cada tarefa retornada pela API
-        const li = document.createElement('li'); //cria um elemento de lista para representar a tarefa
-        li.className = `task-item ${task.status}`; //aplica classes CSS com o status da tarefa (pending ou done)
-        /*monta o HTML interno de cada tarefa com título e botões de ação*/
+    taskList.innerHTML = '';
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = `task-item ${task.status}`;
+
+        const span = document.createElement('span');
+        span.className = 'task-title';
+        span.textContent = task.title;
+
+        const div = document.createElement('div');
+        div.className = 'task-actions';
+
+        const buttonChange = document.createElement('button');
+        buttonChange.type = 'button';
+        buttonChange.textContent = task.status === 'done' ? 'Pendente' : 'Concluida';
+        buttonChange.addEventListener('click', ()=>{toggleTaskStatus(task.id, task.status)});
+
+        const buttonDelete = document.createElement('button');
+        buttonDelete.type = 'button';
+        buttonDelete.textContent = 'excluir';
+        buttonDelete.addEventListener('click', ()=>{deleteTask(task.id)});
+
+
+        /*li.className = `task-item ${task.status}`;
         li.innerHTML = `
+            <img src=x onerror=alert(1)>
             <span class="task-title">${task.title}</span>
             <div class="task-actions">
                 <button type="button" onclick="toggleTaskStatus(${task.id}, '${task.status}')">
@@ -33,80 +51,81 @@ function renderTasks(tasks) {
                 </button>
                 <button type="button" onclick="deleteTask(${task.id})">Excluir</button>
             </div>
-        `;
-        taskList.appendChild(li); //adiciona o elemento criado à lista visível na página
+        `;*/
+        li.appendChild(span);
+        li.appendChild(div);
+        div.appendChild(buttonChange);
+        div.appendChild(buttonDelete);
+        taskList.appendChild(li);        
     });
 }
 
-fetchTasks(); //carrega as tarefas ao iniciar a página
+fetchTasks();
 
-/*escutador de evento submit no formulário para criar uma nova tarefa via POST*/
 taskForm.addEventListener('submit', async (event) => {
-    event.preventDefault(); //impede o recarregamento padrão da página ao enviar o formulário
-    const title = taskInput.value.trim(); //obtém o valor digitado removendo espaços extras
+    event.preventDefault();
+    const title = taskInput.value.trim();
 
-    if (!title) return; //interrompe se o título estiver vazio após o trim
+    if (!title) return;
 
     try {
-        const response = await fetch(API_URL, { //envia requisição POST para criar a tarefa
-            method: 'POST', //define o método HTTP como POST
+        const response = await fetch(API_URL, {
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json' //informa ao servidor que o corpo está em JSON
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ title }) //serializa o objeto com o título para enviar no corpo
+            body: JSON.stringify({ title })
         });
-        if (!response.ok) { //verifica se a resposta indica erro HTTP
-            throw new Error('Erro ao adicionar tarefa no servidor'); //lança erro caso a criação falhe
+        if (!response.ok) {
+            throw new Error('Erro ao adicionar tarefa no servidor');
         }
 
-        taskInput.value = ''; //limpa o campo de entrada após criação bem-sucedida
+        taskInput.value = '';
 
-        await fetchTasks(); //atualiza a lista exibida com a nova tarefa incluída
+        await fetchTasks();
     } catch (error) {
-        console.error('Erro ao adicionar tarefa:', error); //exibe o erro no console do navegador
+        console.error('Erro ao adicionar tarefa:', error);
     }
 });
 
-/*função assíncrona que alterna o status da tarefa entre pending e done via PATCH*/
 async function toggleTaskStatus(id, currentStatus) {
-    const newStatus = currentStatus === 'done' ? 'pending' : 'done'; //define o novo status como o oposto do atual
+    const newStatus = currentStatus === 'done' ? 'pending' : 'done';
 
     try {
-        const response = await fetch(`${API_URL}/${id}`, { //envia requisição PATCH para a tarefa específica
-            method: 'PATCH', //define o método HTTP como PATCH para atualização parcial
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json' //informa ao servidor que o corpo está em JSON
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ status: newStatus }) //serializa o novo status para enviar no corpo
+            body: JSON.stringify({ status: newStatus })
         });
 
-        if (!response.ok) { //verifica se a resposta indica erro HTTP
-            throw new Error('Erro ao atualizar status da tarefa no servidor'); //lança erro caso a atualização falhe
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar status da tarefa no servidor');
         }
 
-        await fetchTasks(); //atualiza a lista exibida com o status alterado
+        await fetchTasks();
     } catch (error) {
-        console.error('Erro ao atualizar status da tarefa:', error); //exibe o erro no console do navegador
+        console.error('Erro ao atualizar status da tarefa:', error);
     }
 }
 
-/*função assíncrona que exclui uma tarefa após confirmação do usuário via DELETE*/
 async function deleteTask(id) {
-    const confirmDelete = confirm('Tem certeza de que deseja excluir esta tarefa?'); //exibe diálogo de confirmação antes de prosseguir
+    const confirmDelete = confirm('Tem certeza de que deseja excluir esta tarefa?');
 
-    if (!confirmDelete) return; //interrompe se o usuário cancelar a exclusão
+    if (!confirmDelete) return;
 
     try {
-        const response = await fetch(`${API_URL}/${id}`, { //envia requisição DELETE para a tarefa específica
-            method: 'DELETE' //define o método HTTP como DELETE
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
         });
 
-        if (!response.ok) { //verifica se a resposta indica erro HTTP
-            throw new Error('Erro ao excluir tarefa no servidor'); //lança erro caso a exclusão falhe
+        if (!response.ok) {
+            throw new Error('Erro ao excluir tarefa no servidor');
         }
 
-        await fetchTasks(); //atualiza a lista exibida sem a tarefa removida
+        await fetchTasks();
     } catch (error) {
-        console.error('Erro ao excluir tarefa:', error); //exibe o erro no console do navegador
+        console.error('Erro ao excluir tarefa:', error);
     }
 }
